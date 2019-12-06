@@ -7,4 +7,5 @@ class Task(models.Model):
     priority=models.IntegerField()
     do_repeat=models.BooleanField()
     interval=models.DurationField(blank=True,null=True)
+    interval_type=models.IntegerField()
     parent=models.ForeignKey("self",on_delete=models.CASCADE,blank=True,null=True)
