@@ -1,186 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
 {% load static %}
+
 <head>
 
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-  <title>Task List / To-do List</title>
+    <title>Task List / To-do List</title>
 
-  <!-- Custom fonts for this template-->
-  <link href="{% static 'todolistapp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'todolistapp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
 
-  <!-- Page level plugin CSS-->
-  <link href="{% static 'todolistapp/vendor/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet">
+    <!-- Page level plugin CSS-->
+    <link href="{% static 'todolistapp/vendor/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet">
 
-  <!-- Custom styles for this template-->
-  <link href="{% static 'todolistapp/css/sb-admin.css' %}" rel="stylesheet">
+    <!-- Custom styles for this template-->
+    <link href="{% static 'todolistapp/css/sb-admin.css' %}" rel="stylesheet">
 
 </head>
 
 <body id="page-top">
 
-  <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+    <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
-    <a class="navbar-brand mr-1" href="#">To-do List</a>
+        <a class="navbar-brand mr-1" href="#">To-do List</a>
 
-    <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
-      <i class="fas fa-bars"></i>
-    </button>
+        <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
+            <i class="fas fa-bars"></i>
+        </button>
 
- 
-    <!-- Navbar -->
-    <ul class="navbar-nav ml-auto ml-md-0">
-      <li class="nav-item dropdown no-arrow mx-1">
-        <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fas fa-bell fa-fw"></i>
-        </a>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="alertsDropdown">
-          <a class="dropdown-item" href="#">Something(Notification)</a>
-        </div>
-      </li>
-    </ul>
 
-  </nav>
+        <!-- Navbar -->
+        <ul class="navbar-nav ml-auto ml-md-0">
+            <li class="nav-item dropdown no-arrow mx-1">
+                <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-bell fa-fw"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="alertsDropdown">
+                    <a class="dropdown-item" href="#">Something(Notification)</a>
+                </div>
+            </li>
+        </ul>
 
-  <div id="wrapper">
+    </nav>
 
-    <!-- Sidebar -->
-    <ul class="sidebar navbar-nav">
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fas fa-fw fa-folder"></i>
-          <span>Manage Tasks</span>
-        </a>
-        <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-          <a class="dropdown-item" href="{% url 'todolistapp:new' %}">New Task</a>
-        </div>
-      </li>
-    </ul>
+    <div id="wrapper">
 
-    <div id="content-wrapper">
+        <!-- Sidebar -->
+        <ul class="sidebar navbar-nav">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>Manage Tasks</span>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="pagesDropdown">
+                    <a class="dropdown-item" href="{% url 'todolistapp:list' %}">View Tasks</a>
+                    <a class="dropdown-item" href="{% url 'todolistapp:new' %}">New Task</a>
+                </div>
+            </li>
+        </ul>
 
-      <div class="container-fluid">
+        <div id="content-wrapper">
 
-        
+            <div class="container-fluid">
 
-        <!-- DataTables Example -->
-        <div class="card mb-3">
-          <div class="card-header">
-            <h2>Task List</h2>
+
+
+                <!-- DataTables Example -->
+                {% if n_overdue %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h2>OVERDUE Task List</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Task Name</th>
+                                        <th>Deadline</th>
+                                        <th>Priority</th>
+                                        <th>Repeat</th>
+                                        <th>Repeat Interval</th>
+                                        <th>Parent Task</th>
+                                        <th>Edit Task</th>
+                                        <th>Delete Task</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for t in t_overdue %}
+                                    <tr>
+                                        <td>{{t.taskname}}</td>
+                                        <td>{{t.deadline}}</td>
+                                        <td>
+                                            {% if t.priority == 0 %}
+                                            Low
+                                            {% elif t.priority == 1 %}
+                                            Medium
+                                            {% elif t.priority == 2 %}
+                                            High
+                                            {% elif t.priority == 3 %}
+                                            Urgent
+                                            {% endif %}
+                                        </td>
+                                        <td>{{t.do_repeat}}</td>
+                                        <td>
+                                            {% if not t.do_repeat %}
+                                            N/A
+                                            {% elif t.interval_type == -1 %}
+                                            {{t.interval}}
+                                            {% elif t.interval_type == 0 %}
+                                            1 Week
+                                            {% elif t.interval_type == 1 %}
+                                            2 Weeks
+                                            {% elif t.interval_type == 2 %}
+                                            1 Month
+                                            {% elif t.interval_type == 3 %}
+                                            2 Month
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if t.parent == None %}
+                                            N/A
+                                            {% else %}
+                                            {{t.parent}}
+                                            {% endif %}
+                                        </td>
+                                        <td><Button class="btn btn-primary">Edit</Button></td>
+                                        <td><a href="{% url 'todolistapp:del' t.id %}"><Button class="btn btn-danger">Delete</Button></a></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h2>Task List</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Task Name</th>
+                                        <th>Deadline</th>
+                                        <th>Priority</th>
+                                        <th>Repeat</th>
+                                        <th>Repeat Interval</th>
+                                        <th>Parent Task</th>
+                                        <th>Edit Task</th>
+                                        <th>Delete Task</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for t in t_intime %}
+                                    <tr>
+                                        <td>{{t.taskname}}</td>
+                                        <td>{{t.deadline}}</td>
+                                        <td>
+                                            {% if t.priority == 0 %}
+                                            Low
+                                            {% elif t.priority == 1 %}
+                                            Medium
+                                            {% elif t.priority == 2 %}
+                                            High
+                                            {% elif t.priority == 3 %}
+                                            Urgent
+                                            {% endif %}
+                                        </td>
+                                        <td>{{t.do_repeat}}</td>
+                                        <td>
+                                            {% if not t.do_repeat %}
+                                            N/A
+                                            {% elif t.interval_type == -1 %}
+                                            {{t.interval}}
+                                            {% elif t.interval_type == 0 %}
+                                            1 Week
+                                            {% elif t.interval_type == 1 %}
+                                            2 Weeks
+                                            {% elif t.interval_type == 2 %}
+                                            1 Month
+                                            {% elif t.interval_type == 3 %}
+                                            2 Month
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if t.parent == None %}
+                                            N/A
+                                            {% else %}
+                                            {{t.parent}}
+                                            {% endif %}
+                                        </td>
+                                        <td><Button class="btn btn-primary">Edit</Button></td>
+                                        <td><a href="{% url 'todolistapp:del' t.id %}"><Button class="btn btn-danger">Delete</Button></a></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
             </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-striped" id="dataTable" width="100%" cellspacing="0">
-                <thead>
-                  <tr>
-                    <th>Task Name</th>
-                    <th>Deadline</th>
-                    <th>Priority</th>
-                    <th>Repeat</th>
-                    <th>Repeat Interval</th>
-                    <th>Parent Task</th>
-                    <th>Edit Task</th>
-                    <th>Delete Task</th>
-                  </tr>
-                </thead>
-                
-                <tbody>
-                {% for t in tasks %}
-                  <tr>
-                    <td>{{t.taskname}}</td>
-                    <td>{{t.deadline}}</td>
-                    <td>
-                      {% if t.priority == 0 %}
-                        Low
-                      {% elif t.priority == 1 %}
-                        Medium
-                      {% elif t.priority == 2 %}
-                        High
-                      {% elif t.priority == 3 %}
-                        Urgent
-                      {% endif %}
-                    </td>
-                    <td>{{t.do_repeat}}</td>
-                    <td>
-                      {% if not t.do_repeat %}
-                        N/A
-                      {% elif t.interval_type == -1 %}
-                        {{t.interval}}
-                      {% elif t.interval_type == 0 %}
-                        1 Week
-                      {% elif t.interval_type == 1 %}
-                        2 Weeks
-                      {% elif t.interval_type == 2 %}
-                        1 Month
-                      {% elif t.interval_type == 3 %}
-                        2 Month
-                      {% endif %}
-                    </td>
-                    <td>
-                      {% if t.parent == None %}
-                        N/A
-                      {% else %}
-                        {{t.parent}}
-                      {% endif %}
-                    </td>
-                    <td><Button class="btn btn-primary">Edit</Button></td>
-                    <td><Button class="btn btn-danger">Delete</Button></td>
-                  </tr>
-                {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
+            <!-- /.container-fluid -->
+
+            <!-- Sticky Footer -->
+            <footer class="sticky-footer">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright © sr_8e 2019</span>
+                    </div>
+                </div>
+            </footer>
+
         </div>
-
-      
-
-      </div>
-      <!-- /.container-fluid -->
-
-      <!-- Sticky Footer -->
-      <footer class="sticky-footer">
-        <div class="container my-auto">
-          <div class="copyright text-center my-auto">
-            <span>Copyright © sr_8e 2019</span>
-          </div>
-        </div>
-      </footer>
+        <!-- /.content-wrapper -->
 
     </div>
-    <!-- /.content-wrapper -->
+    <!-- /#wrapper -->
 
-  </div>
-  <!-- /#wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
 
-  <!-- Scroll to Top Button-->
-  <a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-  </a>
+    <!-- Logout Modal-->
 
-  <!-- Logout Modal-->
-  
-  <!-- Bootstrap core JavaScript-->
-  <script src="{% static 'todolistapp/vendor/jquery/jquery.min.js' %}"></script>
-  <script src="{% static 'todolistapp/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'todolistapp/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'todolistapp/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
-  <!-- Core plugin JavaScript-->
-  <script src="{% static 'todolistapp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'todolistapp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
 
-  <!-- Page level plugin JavaScript-->
-  <script src="{% static 'todolistapp/vendor/datatables/jquery.dataTables.js' %}"></script>
-  <script src="{% static 'todolistapp/vendor/datatables/dataTables.bootstrap4.js' %}"></script>
+    <!-- Page level plugin JavaScript-->
+    <script src="{% static 'todolistapp/vendor/datatables/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'todolistapp/vendor/datatables/dataTables.bootstrap4.js' %}"></script>
 
-  <!-- Custom scripts for all pages-->
-  <script src="{% static 'todolistapp/js/sb-admin.min.js' %}"></script>
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'todolistapp/js/sb-admin.min.js' %}"></script>
 
-  <!-- Demo scripts for this page-->
-  <script src="{% static 'todolistapp/js/demo/datatables-demo.js' %}"></script>
+    <!-- Demo scripts for this page-->
+    <script src="{% static 'todolistapp/js/demo/datatables-demo.js' %}"></script>
 
 </body>
 
