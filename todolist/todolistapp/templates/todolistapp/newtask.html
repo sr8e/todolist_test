@@ -58,7 +58,7 @@
                     <span>Manage Tasks</span>
                 </a>
                 <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-                    
+
                     <a class="dropdown-item" href="{% url 'todolistapp:list' %}">View Tasks</a>
                     <a class="dropdown-item" href="{% url 'todolistapp:new' %}">New Task</a>
                 </div>
@@ -74,32 +74,33 @@
                 <!-- DataTables Example -->
                 <div class="card mb-3">
                     <div class="card-header">
-                        <h2>Task List</h2>
+                        <h2>Create Task</h2>
                     </div>
                     <div class="card-body">
                         <div>
-                            <form method="post" action="{% url 'todolistapp:reg' %}">
+                            <form method="post" action="{% url 'todolistapp:reg' %}" id="regtask">
                                 {% csrf_token %}
                                 <input name="pk" value="{{ pk }}" hidden>
                                 <div class="form-group row">
                                     <label class="col-sm-2">Task Name</label>
-                                    <input class="form-control col-sm-8" name="taskname">
+                                    <input class="form-control col-sm-7" name="taskname">
+                                    <div class="col-sm-1" id="tnin"></div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-2">DeadLine</label>
-                                    <div class="row col-sm-8">
+                                    <div class="row col-sm-8" id="datein">
                                         <div class="row col-sm-7">
-                                            <input class="form-control col-sm-4" name="dl_y" placeholder="Year">
+                                            <div class="col col-sm-4"><input class="form-control" name="dl_y" placeholder="Year"></div>
                                             <span class="col-sm-1">/</span>
-                                            <input class="form-control col-sm-3" name="dl_mon" placeholder="Month">
+                                            <div class="col col-sm-3"><input class="form-control" name="dl_mon" placeholder="Month"></div>
                                             <span class="col-sm-1">/</span>
-                                            <input class="form-control col-sm-3" name="dl_d" placeholder="Day">
+                                            <div class="col col-sm-3"><input class="form-control" name="dl_d" placeholder="Day"></div>
                                         </div>
                                         <span class="col-sm-1"></span>
                                         <div class="col-sm-4 row">
-                                            <input class="form-control col-sm-5" name="dl_h" placeholder="Hour">
+                                            <div class="col col-sm-5"><input class="form-control" name="dl_h" placeholder="Hour"></div>
                                             <span class="col-sm-1">:</span>
-                                            <input class="form-control col-sm-5" name="dl_min" placeholder="Minute">
+                                            <div class="col col-sm-5"><input class="form-control" name="dl_min" placeholder="Minute"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -114,7 +115,7 @@
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-2">Repeat</label>
-                                    <input type="checkbox" name="repeat" value="1">
+                                    <input type="checkbox" id="repeat" name="repeat" value="1">
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-2">Interval</label>
@@ -129,7 +130,8 @@
                                 <div class="form-group row">
                                     <label class="col-sm-2">Custom Duration</label>
                                     <input class="form-control col-sm-3" name="interval">
-                                    <span class="col-sm-3">Days</span>
+                                    <span class="col-sm-1">Days</span>
+                                    <div class="col-sm-0" id="intin"></div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-2">Parent Task</label>
@@ -183,6 +185,7 @@
 
     <!-- Core plugin JavaScript-->
     <script src="{% static 'todolistapp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+    <script src="{% static 'todolistapp/vendor/jquery/jquery.validation.min.js' %}"></script>
 
     <!-- Page level plugin JavaScript-->
     <script src="{% static 'todolistapp/vendor/datatables/jquery.dataTables.js' %}"></script>
@@ -194,6 +197,65 @@
     <!-- Demo scripts for this page-->
     <script src="{% static 'todolistapp/js/demo/datatables-demo.js' %}"></script>
 
+    <script>
+        jQuery.validator.addMethod("checkinterval", function(v, e) {
+            var r = $("#repeat").prop("checked");
+            return !r || v !== "";
+        }, "Required");
+        $("#regtask").validate({
+            rules: {
+                taskname: {
+                    required: true
+                },
+                dl_y: {
+                    required: true,
+                    number: true
+                },
+                dl_mon: {
+                    required: true,
+                    number: true
+                },
+                dl_d: {
+                    required: true,
+                    number: true
+                },
+                dl_h: {
+                    required: true,
+                    number: true
+                },
+                dl_min: {
+                    required: true,
+                    number: true
+                },
+
+                interval: {
+                    checkinterval: true,
+                    number: true
+                }
+
+
+            },
+            messages: {
+                taskname: {required:"Required", number:"Invalid value"},
+                dl_y: {required:"Required", number:"Invalid value"},
+                dl_mon: {required:"Required", number:"Invalid value"},
+                dl_d: {required:"Required", number:"Invalid value"},
+                dl_h: {required:"Required", number:"Invalid value"},
+                dl_min: {required:"Required", number:"Invalid value"},
+            },
+            errorPlacement: function(er, el) {
+                if (el.attr("name") == "interval") {
+                    er.insertAfter("#intin");
+                } else if (el.attr("name") == "taskname") {
+                    er.insertAfter("#tnin");
+
+                } else {
+                    er.insertAfter(el)
+                }
+            }
+        });
+
+    </script>
 </body>
 
 </html>
