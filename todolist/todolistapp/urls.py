@@ -9,5 +9,7 @@ urlpatterns = [
     path('new/', views.makenewtask, name='new'),
     path('register/',views.registertask, name='reg'),
     path('delete/<int:pk>/', views.deletetask, name='del'),
+    path('edit/<int:pk>/',views.edittask, name='edit'),
+    path('view/<int:pk>/',views.viewtask, name='view'),
 
 ]

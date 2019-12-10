@@ -6,7 +6,9 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 #
-def checkdue(tasks):
+prop_keys=["id","taskname","deadline","priority","do_repeat","interval_type","interval","parent"]
+
+def checkdue(tasks, pk=-1):
     intervals=[
         {"days":7},{"days":14},{"months":1},{"months":2}
     ]
@@ -14,6 +16,7 @@ def checkdue(tasks):
     t_overdue=[]
     t_intime=[]
     for t in tasks:
+        if t.id==pk:continue
         if t.deadline<now:
             if t.do_repeat:
                 tp=t.interval_type
@@ -46,8 +49,12 @@ def makenewtask(req):
     # show task registration form
     tasks=Task.objects.all()
     t_overdue,t_intime,n=checkdue(tasks)
+
+    prop_values=[-1,"",None,0,False,-1,"",-1]
+    page={"title":"Create",}
+    context={prop_keys[i]:prop_values[i] for i in range(len(prop_keys))}
     
-    return render(req, 'todolistapp/newtask.html',{'t_overdue':t_overdue, 't_intime':t_intime, 'n_overdue':n, 'pk':-1})
+    return render(req, 'todolistapp/newtask.html',{'t_overdue':t_overdue, 't_intime':t_intime, 'n_overdue':n, 'page':page, 'context':context})
 
 def registertask(req):
     # register task
@@ -76,5 +83,16 @@ def deletetask(req,pk):
 
 def edittask(req,pk):
     tasks=Task.objects.all()
+    t_overdue,t_intime,n=checkdue(tasks,pk)
+
+    t=Task.objects.get(pk=pk)
+    page={"title":"Edit",}
+    
+    context={k:getattr(t,k) for k in prop_keys}
+    context["deadline"]=context["deadline"].astimezone()
+
+    return render(req, 'todolistapp/newtask.html',{'t_overdue':t_overdue, 't_intime':t_intime, 'n_overdue':n, 'page':page, 'context':context})
+
+def viewtask(req,pk):
     return http.HttpResponse("pk:%d"%pk)
 

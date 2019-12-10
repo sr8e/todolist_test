@@ -10,7 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Create Task / To-do List</title>
+    <title>{{ page.title }} Task / To-do List</title>
 
     <!-- Custom fonts for this template-->
     <link href="{% static 'todolistapp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
@@ -74,62 +74,68 @@
                 <!-- DataTables Example -->
                 <div class="card mb-3">
                     <div class="card-header">
-                        <h2>Create Task</h2>
+                        <h2>{{ page.title }} Task</h2>
                     </div>
                     <div class="card-body">
                         <div>
                             <form method="post" action="{% url 'todolistapp:reg' %}" id="regtask">
                                 {% csrf_token %}
-                                <input name="pk" value="{{ pk }}" hidden>
+                                <input name="pk" value="{{ context.id }}" hidden>
                                 <div class="form-group row">
                                     <label class="col-sm-2">Task Name</label>
-                                    <input class="form-control col-sm-7" name="taskname">
+                                    <input class="form-control col-sm-7" name="taskname" value="{{ context.taskname }}">
                                     <div class="col-sm-1" id="tnin"></div>
                                 </div>
                                 <div class="form-group row">
+                                {% with dl=context.deadline %}
                                     <label class="col-sm-2">DeadLine</label>
                                     <div class="row col-sm-8" id="datein">
                                         <div class="row col-sm-7">
-                                            <div class="col col-sm-4"><input class="form-control" name="dl_y" placeholder="Year"></div>
+                                            <div class="col col-sm-4"><input class="form-control" name="dl_y" placeholder="Year" value="{% if dl %}{{ dl.year }}{% endif %}"></div>
                                             <span class="col-sm-1">/</span>
-                                            <div class="col col-sm-3"><input class="form-control" name="dl_mon" placeholder="Month"></div>
+                                            <div class="col col-sm-3"><input class="form-control" name="dl_mon" placeholder="Month" value="{% if dl %}{{ dl.month }}{% endif %}"></div>
                                             <span class="col-sm-1">/</span>
-                                            <div class="col col-sm-3"><input class="form-control" name="dl_d" placeholder="Day"></div>
+                                            <div class="col col-sm-3"><input class="form-control" name="dl_d" placeholder="Day" value="{% if dl %}{{ dl.day }}{% endif %}"></div>
                                         </div>
                                         <span class="col-sm-1"></span>
                                         <div class="col-sm-4 row">
-                                            <div class="col col-sm-5"><input class="form-control" name="dl_h" placeholder="Hour"></div>
+                                            <div class="col col-sm-5"><input class="form-control" name="dl_h" placeholder="Hour" value="{% if dl %}{{ dl.hour }}{% endif %}"></div>
                                             <span class="col-sm-1">:</span>
-                                            <div class="col col-sm-5"><input class="form-control" name="dl_min" placeholder="Minute"></div>
+                                            <div class="col col-sm-5"><input class="form-control" name="dl_min" placeholder="Minute" value="{% if dl %}{{ dl.minute }}{% endif %}"></div>
                                         </div>
                                     </div>
+                                {% endwith %}
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-2">Priority</label>
                                     <select class="custom-select col-sm-4" name="priority">
-                                        <option value="0">Low</option>
-                                        <option value="1">Medium</option>
-                                        <option value="2">High</option>
-                                        <option value="3">Urgent</option>
+                                    {% with pr=context.priority %}
+                                        <option value="0" {% if pr == 0 %}selected{% endif %}>Low</option>
+                                        <option value="1" {% if pr == 1 %}selected{% endif %}>Medium</option>
+                                        <option value="2" {% if pr == 2 %}selected{% endif %}>High</option>
+                                        <option value="3" {% if pr == 3 %}selected{% endif %}>Urgent</option>
+                                    {% endwith %}
                                     </select>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-2">Repeat</label>
-                                    <input type="checkbox" id="repeat" name="repeat" value="1">
+                                    <input type="checkbox" id="repeat" name="repeat" value="1" {% if context.do_repeat %}checked{% endif %}>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-2">Interval</label>
                                     <select class="custom-select col-sm-4" name="itvltype">
-                                        <option value="-1">Custom</option>
-                                        <option value="0">1 Week</option>
-                                        <option value="1">2 Weeks</option>
-                                        <option value="2">1 Month</option>
-                                        <option value="3">2 Months</option>
+                                    {% with it=context.interval_type %}
+                                        <option value="-1" {% if it == -1 %}selected{% endif %}>Custom</option>
+                                        <option value="0" {% if it == 0 %}selected{% endif %}>1 Week</option>
+                                        <option value="1" {% if it == 1 %}selected{% endif %}>2 Weeks</option>
+                                        <option value="2" {% if it == 2 %}selected{% endif %}>1 Month</option>
+                                        <option value="3" {% if it == 3 %}selected{% endif %}>2 Months</option>
+                                    {% endwith %}
                                     </select>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-2">Custom Duration</label>
-                                    <input class="form-control col-sm-3" name="interval">
+                                    <input class="form-control col-sm-3" name="interval" value={{ context.interval|default_if_none:"" }}>
                                     <span class="col-sm-1">Days</span>
                                     <div class="col-sm-0" id="intin"></div>
                                 </div>
@@ -138,14 +144,17 @@
                                     <select class="custom-select col-sm-8" name="parent">
                                         <option value="-1">None</option>
                                         {% for task in t_intime %}
-                                        <option value="{{task.id}}">{{task.taskname}}</option>
+                                        <option value="{{task.id}}" {% if task.id == context.parent.id %}selected{% endif %}>{{task.taskname}}</option>
                                         {% endfor %}
                                         {% for task in t_overdue %}
-                                        <option value="{{task.id}}">{{task.taskname}}(Overdue)</option>
+                                        <option value="{{task.id}}" {% if task.id == context.parent.id %}selected{% endif %}>{{task.taskname}}(Overdue)</option>
                                         {% endfor %}
                                     </select>
                                 </div>
                                 <button type="submit" class="btn btn-success">Submit</button>
+                                {% if context.id != -1 %}
+                                <a href="{% url 'todolistapp:del' context.id %}"><button type="button" class="btn btn-danger">Delete</button>
+                                {% endif %}
                             </form>
 
                         </div>
