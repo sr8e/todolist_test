@@ -72,6 +72,12 @@
 
 
                 <!-- DataTables Example -->
+                {% if page.msg %}
+                <div class="alert alert-danger" role="alert">
+                    Input Data was invalid ({{ page.msg }})
+                </div>
+                {% endif %}
+
                 <div class="card mb-3">
                     <div class="card-header">
                         <h2>{{ page.title }} Task</h2>
