@@ -20,7 +20,7 @@ prop_keys=["id","taskname","deadline","priority","do_repeat","interval_type","in
 # Create your views here.
 def top(req):
     # ?
-    return HttpResponse("Welcome")
+    return http.HttpResponseRedirect(reverse('todolistapp:list'))
     
 def showtasklist(req):
     tasks=Task.objects.all()
