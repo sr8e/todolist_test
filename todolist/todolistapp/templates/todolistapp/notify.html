@@ -1,0 +1,14 @@
+<a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    {% if n > 0 %}
+    <span class="badge badge-pill badge-danger">{{ n }}</span>
+    {% endif %}
+    <i class="fas fa-bell fa-fw"></i>
+</a>
+
+<div class="dropdown-menu dropdown-menu-left" aria-labelledby="alertsDropdown">
+    {% for t in t_overdue %}
+        <a class="dropdown-item" href="{% url 'todolistapp:view' t.id %}"><span class="font-weight-bold text-danger">The deadline of {{ t.taskname }} has passed!</span>({{ t.deadline|date:"Y/m/d H:i" }})</a>
+    {% empty %}
+        <span class="dropdown-item">There is no notification.</span>
+    {% endfor %}
+</div>

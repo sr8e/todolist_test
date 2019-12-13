@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+{% load customfilters %}
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{{ task.taskname }} / To-do List</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'todolistapp/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+
+    <!-- Page level plugin CSS-->
+    <link href="{% static 'todolistapp/vendor/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="{% static 'todolistapp/css/sb-admin.css' %}" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+    {% include 'todolistapp/navbar.html' %}
+
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        {% include 'todolistapp/sidebar.html' %}
+
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h2>{{ task.taskname }}</h2>
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <div class="row">
+                                <label class="col-sm-2">Task Name</label>
+                                <div class="col-sm-8">{{ task.taskname }}</div>
+                            </div>
+                            <div class="row">
+                                {% with dl=task.deadline %}
+                                    <label class="col-sm-2">DeadLine</label>
+                                    <div class="col-sm-8">
+                                        {{ task.deadline|date:"Y/m/d H:i" }}
+                                        {% if delta.days < 0 %}(<span class='text-danger'>{{ delta|durabs|durtime }} Over</span> )
+                                        {% else %}({{ delta|durtime }} Left )
+                                        {% endif %}
+                                    </div>
+                                {% endwith %}
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-2">Priority</label>
+                                <div class="col-sm-4">
+                                    {% with pr=task.priority %}
+                                        {% if pr == 0 %}Low
+                                        {% elif pr == 1 %}Medium
+                                        {% elif pr == 2 %}High
+                                        {% elif pr == 3 %}Urgent
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-2">Repeat</label>
+                                <div class="col-sm-8">{{ task.do_repeat }}</div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-2">Interval</label>
+                                <div class="col-sm-4">
+                                    {% with it=task.interval_type %}
+                                        {% if not task.do_repeat %}N/A
+                                        {% elif it == -1 %}{{ task.interval|duration }}
+                                        {% elif it == 0 %}1 Week
+                                        {% elif it == 1 %}2 Weeks
+                                        {% elif it == 2 %}1 Month
+                                        {% elif it == 3 %}2 Months
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                                
+                            <div class="row">
+                                <label class="col-sm-2">Parent Task</label>
+                                <div class="col-sm-8" name="parent">
+                                    {% if not task.parent %}N/A
+                                    {% else %}<a href="{% url 'todolistapp:view' task.parent.id %}">{{ task.parent.taskname }}</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <a href="{% url 'todolistapp:edit' task.id %}"><button type="button" class="btn btn-primary">Edit</button></a>
+                            <a href="{% url 'todolistapp:del' task.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
+                            
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <!-- /.container-fluid -->
+
+            <!-- Sticky Footer -->
+            <footer class="sticky-footer">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright © sr_8e 2019</span>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+        <!-- /.content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'todolistapp/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'todolistapp/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'todolistapp/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+    <script src="{% static 'todolistapp/vendor/jquery/jquery.validation.min.js' %}"></script>
+
+    <!-- Page level plugin JavaScript-->
+    <script src="{% static 'todolistapp/vendor/datatables/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'todolistapp/vendor/datatables/dataTables.bootstrap4.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'todolistapp/js/sb-admin.min.js' %}"></script>
+
+    <!-- Demo scripts for this page-->
+    <script src="{% static 'todolistapp/js/demo/datatables-demo.js' %}"></script>
+
+    
+</body>
+
+</html>

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'todolistapp',
     'todolistapp.templatetags.customfilters',
+    'todolistapp.templatetags.customtags',
 ]
 
 MIDDLEWARE = [
